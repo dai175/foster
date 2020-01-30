@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Foster an animal | Category</title>
+</head>
+<body>
+    <ul>
+        <li>id:{{ category.id }}</li>
+        <li>name:{{ category.name }}</li>
+        <li>description:{{ category.description }}</li>
+    </ul>
+    <div>
+        <a href="/category/{{ category.id }}/edit"><button>edit</button></a>
+    </div>
+    <div>
+        <a href="/"><button>home</button></a>
+    </div>
+</body>
+</html>
