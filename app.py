@@ -1,10 +1,13 @@
 import os
+
+from PIL import Image
 from flask import Flask, request, abort, jsonify, render_template, flash, \
     redirect, url_for
 from flask_migrate import Migrate
 from flask_cors import CORS
 
 # create and configure the app
+import consts
 from forms import CategoryForm
 from models import db, Category
 
@@ -19,8 +22,21 @@ migrate = Migrate(app, db)
 CORS(app)
 
 
-def create_app(test_config=None):
+def upload_image(file, id):
+    image = Image.open(file)
+    resize_image = image.resize(
+        (int(image.width / image.height * consts.IMAGE_HEIGHT),
+         consts.IMAGE_HEIGHT)
+    )
+    filename = 'c{}.png'.format(str(id).zfill(consts.NUMBER_OF_DIGITS))
+    resize_image.save(
+        os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    )
 
+    return filename
+
+
+def create_app(test_config=None):
     @app.route('/')
     def index():
         return render_template('index.html')
@@ -40,16 +56,20 @@ def create_app(test_config=None):
 
     @app.route('/categories/create', methods=['POST'])
     def create_category_submission():
-
         category = Category(
             name=request.form['name'],
-            description=request.form['description'],
-            image=request.form['image'],
+            description=request.form['description']
         )
+
         error = False
 
         try:
             db.session.add(category)
+            db.session.commit()
+
+            file = request.files['image']
+            filename = upload_image(file, category.id)
+            category.image = filename
             db.session.commit()
         except:
             error = True
@@ -58,12 +78,11 @@ def create_app(test_config=None):
             db.session.close()
 
         if not error:
-            flash('Category ' + request.form['name'] + ' was successfully listed!')
+            flash('Category {} was successfully listed!'.
+                  format(request.form['name']))
         else:
-            flash('An error occurred. Category ' + request.form['name'] + ' could not be listed.')
-
-        categories = Category.query.order_by(Category.id).all()
-        data = [category.format() for category in categories]
+            flash('An error occurred. Category {} could not be listed.'.
+                  format(request.form['name']))
 
         return redirect(url_for('get_categories'))
 
@@ -88,10 +107,28 @@ def create_app(test_config=None):
         category = Category.query.get(category_id)
         category.name = request.form['name']
         category.description = request.form['description']
-        category.image = request.form['image']
-        db.session.commit()
 
-        data = category.format()
+        error = False
+
+        try:
+            db.session.commit()
+
+            file = request.files['image']
+            if file:
+                filename = upload_image(file, category_id)
+                category.image = filename
+        except:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Category {} was successfully updated!'.
+                  format(request.form['name']))
+        else:
+            flash('An error occurred. Category {} could not be updated.'.
+                  format(request.form['name']))
 
         return redirect(url_for('get_category', category_id=category_id))
 

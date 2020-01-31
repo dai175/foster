@@ -5,7 +5,16 @@
     <title>Foster an animal | Category</title>
 </head>
 <body>
-    <form class="form" method="post" action="/categories/create">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form class="form" method="post" enctype="multipart/form-data" action="/categories/create">
         {{ form.csrf_token }}
         <div>
             <label for="name">Name</label>

@@ -5,7 +5,7 @@
     <title>Foster an animal | Category</title>
 </head>
 <body>
-    <form class="form" method="post" action="/category/{{ category.id }}/edit">
+    <form class="form" method="post" enctype="multipart/form-data" action="/category/{{ category.id }}/edit">
         {{ form.csrf_token }}
         <div>
             <label for="name">Name</label>
@@ -17,7 +17,7 @@
         </div>
         <div>
             <label for="image">Image</label>
-            {{ form.image(value=category.image) }}
+            {{ form.image }}
         </div>
         <button>submit</button>
     </form>
