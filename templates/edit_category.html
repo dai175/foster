@@ -5,22 +5,19 @@
     <title>Foster an animal | Category</title>
 </head>
 <body>
-    <form method="post" action="/category/{{ category.id }}/edit">
-        <div>
-            <label for="id">ID</label>
-            <input type="text" name="id" value="{{ category.id }}">
-        </div>
+    <form class="form" method="post" action="/category/{{ category.id }}/edit">
+        {{ form.csrf_token }}
         <div>
             <label for="name">Name</label>
-            <input type="text" name="name" value="{{ category.name }}">
+            {{ form.name(value=category.name) }}
         </div>
         <div>
             <label for="description">Description</label>
-            <input type="text" name="description" value="{{ category.description }}">
+            {{ form.description(value=category.description) }}
         </div>
         <div>
             <label for="image">Image</label>
-            <input type="text" name="image" value="{{ category.image }}">
+            {{ form.image(value=category.image) }}
         </div>
         <button>submit</button>
     </form>

@@ -1,9 +1,11 @@
 import os
-from flask import Flask, request, abort, jsonify, render_template, flash
+from flask import Flask, request, abort, jsonify, render_template, flash, \
+    redirect, url_for
 from flask_migrate import Migrate
 from flask_cors import CORS
 
 # create and configure the app
+from forms import CategoryForm
 from models import db, Category
 
 app = Flask(__name__)
@@ -32,8 +34,9 @@ def create_app(test_config=None):
 
     @app.route('/categories/create', methods=['GET'])
     def create_category():
+        form = CategoryForm(request.form)
 
-        return render_template('new_category.html')
+        return render_template('new_category.html', form=form)
 
     @app.route('/categories/create', methods=['POST'])
     def create_category_submission():
@@ -62,7 +65,7 @@ def create_app(test_config=None):
         categories = Category.query.order_by(Category.id).all()
         data = [category.format() for category in categories]
 
-        return render_template('categories.html', categories=data)
+        return redirect(url_for('get_categories'))
 
     @app.route('/category/<int:category_id>')
     def get_category(category_id):
@@ -73,10 +76,12 @@ def create_app(test_config=None):
 
     @app.route('/category/<int:category_id>/edit', methods=['GET'])
     def edit_category(category_id):
+        form = CategoryForm(request.form)
+
         category = Category.query.get(category_id)
         data = category.format()
 
-        return render_template('edit_category.html', category=data)
+        return render_template('edit_category.html', form=form, category=data)
 
     @app.route('/category/<int:category_id>/edit', methods=['POST'])
     def edit_category_submission(category_id):
@@ -88,7 +93,7 @@ def create_app(test_config=None):
 
         data = category.format()
 
-        return render_template('category.html', category=data)
+        return redirect(url_for('get_category', category_id=category_id))
 
     return app
 

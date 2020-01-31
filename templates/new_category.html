@@ -5,18 +5,19 @@
     <title>Foster an animal | Category</title>
 </head>
 <body>
-    <form method="post" action="/categories/create">
+    <form class="form" method="post" action="/categories/create">
+        {{ form.csrf_token }}
         <div>
             <label for="name">Name</label>
-            <input type="text" name="name">
+            {{ form.name }}
         </div>
         <div>
             <label for="description">Description</label>
-            <input type="text" name="description">
+            {{ form.description }}
         </div>
         <div>
             <label for="image">Image</label>
-            <input type="text" name="image">
+            {{ form.image }}
         </div>
         <button>submit</button>
     </form>
