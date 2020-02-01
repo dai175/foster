@@ -7,6 +7,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 # create and configure the app
+from sqlalchemy import exc
+
 import consts
 from forms import CategoryForm
 from models import db, Category
@@ -68,10 +70,11 @@ def create_app(test_config=None):
             db.session.commit()
 
             file = request.files['image']
-            filename = upload_image(file, category.id)
-            category.image = filename
-            db.session.commit()
-        except:
+            if file:
+                filename = upload_image(file, category.id)
+                category.image = filename
+                db.session.commit()
+        except exc.SQLAlchemyError:
             error = True
             db.session.rollback()
         finally:
@@ -117,7 +120,8 @@ def create_app(test_config=None):
             if file:
                 filename = upload_image(file, category_id)
                 category.image = filename
-        except:
+                db.session.commit()
+        except exc.SQLAlchemyError:
             error = True
             db.session.rollback()
         finally:

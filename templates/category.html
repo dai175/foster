@@ -1,24 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Foster an animal | Category</title>
-</head>
-<body>
+{% extends "layout.html" %}
+{% block body %}
     <ul>
-        <li>id:{{ category.id }}</li>
-        <li>name:{{ category.name }}</li>
-        <li>description:{{ category.description }}</li>
-        <li>image:{{ category.image }}</li>
+        <li>
+            <span class="list-heading">id</span>
+            <span class="list-value">{{ category.id }}</span>
+        </li>
+        <li>
+            <span class="list-heading">name</span>
+            <span class="list-value">{{ category.name }}</span>
+        </li>
+        <li>
+            <span class="list-heading">description</span>
+            <span class="list-value">{% if category.description %}{{ category.description }}{% else %}None{% endif %}</span>
+        </li>
+        <li>
+            <span class="list-heading">image</span>
+            <span class="list-value">{% if category.image %}{{ category.image }}{% else %}None{% endif %}</span>
+        </li>
     </ul>
     <div>
-        <img src="/static/images/{{ category.image }}">
+        {% if category.image %}<img src="/static/images/{{ category.image }}">{% endif %}
     </div>
     <div>
-        <a href="/category/{{ category.id }}/edit"><button>edit</button></a>
+        <a href="/category/{{ category.id }}/edit"><button class="btn btn-primary">Edit</button></a>
     </div>
-    <div>
-        <a href="/"><button>home</button></a>
-    </div>
-</body>
-</html>
+{% endblock %}

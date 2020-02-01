@@ -1,29 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Foster an animal | Categories</title>
-</head>
-<body>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+{% extends "layout.html" %}
+{% block body %}
     {% for category in categories %}
     <div>
         <a href="/category/{{ category.id }}">{{ category.name }}</a>
     </div>
     {% endfor %}
     <div>
-        <a href="/categories/create"><button>create</button></a>
+        <a href="/categories/create"><button class="btn btn-primary">Create</button></a>
     </div>
-    <div>
-        <a href="/"><button>home</button></a>
-    </div>
-</body>
-</html>
+{% endblock %}

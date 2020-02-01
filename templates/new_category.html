@@ -1,37 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Foster an animal | Category</title>
-</head>
-<body>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+{% extends "layout.html" %}
+{% block body %}
     <form class="form" method="post" enctype="multipart/form-data" action="/categories/create">
         {{ form.csrf_token }}
-        <div>
+        <ul>
+        <li>
             <label for="name">Name</label>
             {{ form.name }}
-        </div>
-        <div>
+        </li>
+        <li>
             <label for="description">Description</label>
             {{ form.description }}
-        </div>
-        <div>
+        </li>
+        <li>
             <label for="image">Image</label>
             {{ form.image }}
-        </div>
-        <button>submit</button>
+        </li>
+        <button class="btn btn-primary">Submit</button>
+        </ul>
     </form>
-    <div>
-        <a href="/"><button>home</button></a>
-    </div>
-</body>
-</html>
+{% endblock %}

@@ -1,14 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Foster an animal</title>
-</head>
-<body>
-    <h1>Foster an animal</h1>
-    <p>Where animals meet fosters.</p>
+{% extends "layout.html" %}
+{% block body %}
+    <p>A place where animals meet foster parents.</p>
     <h3>
-        <a href="/categories"><button>categories</button></a>
+        <a href="/categories"><button class="btn btn-primary">Categories</button></a>
     </h3>
-</body>
-</html>
+{% endblock %}

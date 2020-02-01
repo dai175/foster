@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Foster an animal | Category</title>
-</head>
-<body>
+{% extends "layout.html" %}
+{% block body %}
     <form class="form" method="post" enctype="multipart/form-data" action="/category/{{ category.id }}/edit">
         {{ form.csrf_token }}
         <div>
@@ -19,10 +14,6 @@
             <label for="image">Image</label>
             {{ form.image }}
         </div>
-        <button>submit</button>
+        <button class="btn btn-primary">Submit</button>
     </form>
-    <div>
-        <a href="/"><button>home</button></a>
-    </div>
-</body>
-</html>
+{% endblock %}
