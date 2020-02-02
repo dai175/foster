@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h3>Type</h3>
+    <ul>
+        <li>
+            <span class="list-heading">category</span>
+            <span class="list-value">{{ type.category.name }}</span>
+        </li>
+        <li>
+            <span class="list-heading">id</span>
+            <span class="list-value">{{ type.id }}</span>
+        </li>
+        <li>
+            <span class="list-heading">name</span>
+            <span class="list-value">{{ type.name }}</span>
+        </li>
+        <li>
+            <span class="list-heading">description</span>
+            <span class="list-value">{% if type.description %}{{ type.description }}{% else %}None{% endif %}</span>
+        </li>
+        <li>
+            <span class="list-heading">image</span>
+            <span class="list-value">{% if type.image %}{{ type.image }}{% else %}None{% endif %}</span>
+        </li>
+    </ul>
+    <div>
+        {% if type.image %}<img src="/static/images/{{ type.image }}">{% endif %}
+    </div>
+    <div>
+        <a href="/type/{{ type.id }}/edit"><button class="btn btn-primary">Edit</button></a>
+    </div>
+{% endblock %}

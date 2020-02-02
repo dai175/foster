@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+    <h3>Edit Category</h3>
     <form class="form" method="post" enctype="multipart/form-data" action="/category/{{ category.id }}/edit">
         {{ form.csrf_token }}
         <div>

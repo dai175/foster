@@ -10,8 +10,8 @@ from flask_cors import CORS
 from sqlalchemy import exc
 
 import consts
-from forms import CategoryForm
-from models import db, Category
+from forms import CategoryForm, TypeForm
+from models import db, Category, Type
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -42,6 +42,10 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         return render_template('index.html')
+
+    # ------------------------------------------------------------------------
+    #   Categories
+    # ------------------------------------------------------------------------
 
     @app.route('/categories')
     def get_categories():
@@ -135,6 +139,123 @@ def create_app(test_config=None):
                   format(request.form['name']))
 
         return redirect(url_for('get_category', category_id=category_id))
+
+    # ------------------------------------------------------------------------
+    #   Types
+    # ------------------------------------------------------------------------
+
+    @app.route('/types')
+    def get_types():
+        data = []
+        categories = Category.query.order_by(Category.id).all()
+        for category in categories:
+            types = Type.query.filter(Type.category_id == category.id).all()
+            formatted_types = [type.format() for type in types]
+            item = category.format()
+            item['types'] = formatted_types
+            data.append(item)
+
+        return render_template('types.html', categories=data)
+
+    @app.route('/types/create', methods=['GET'])
+    def create_type():
+        categories = Category.query.order_by(Category.id).all()
+
+        form = TypeForm(request.form)
+        form.category.choices = [
+            (category.id, category.name) for category in categories
+        ]
+
+        return render_template('new_type.html', form=form)
+
+    @app.route('/types/create', methods=['POST'])
+    def create_type_submission():
+        type = Type(
+            category_id=int(request.form['category']),
+            name=request.form['name'],
+            description=request.form['description']
+        )
+
+        error = False
+
+        try:
+            db.session.add(type)
+            db.session.commit()
+
+            file = request.files['image']
+            if file:
+                filename = upload_image(file, type.id)
+                type.image = filename
+                db.session.commit()
+        except exc.SQLAlchemyError:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Type {} was successfully listed!'.
+                  format(request.form['name']))
+        else:
+            flash('An error occurred. Type {} could not be listed.'.
+                  format(request.form['name']))
+
+        return redirect(url_for('get_types'))
+
+    @app.route('/type/<int:type_id>')
+    def get_type(type_id):
+        type = Type.query.get(type_id)
+        data = type.format()
+        data['category'] = Category.query.get(type.category_id)
+
+        return render_template('type.html', type=data)
+
+    @app.route('/type/<int:type_id>/edit', methods=['GET'])
+    def edit_type(type_id):
+        categories = Category.query.order_by(Category.id).all()
+        type = Type.query.get(type_id)
+        data = type.format()
+
+        form = TypeForm(request.form)
+        form.category.choices = [
+            (category.id, category.name) for category in categories
+        ]
+        form.category.default = type.category_id
+        form.process()
+
+        return render_template('edit_type.html', form=form, type=data)
+
+    @app.route('/type/<int:type_id>/edit', methods=['POST'])
+    def edit_type_submission(type_id):
+        type = Type.query.get(type_id)
+        type.name = request.form['name']
+        type.description = request.form['description']
+        type.category_id = int(request.form['category'])
+
+        error = False
+
+        try:
+            db.session.commit()
+
+            file = request.files['image']
+            if file:
+                filename = upload_image(file, type_id)
+                type.image = filename
+                db.session.commit()
+        except exc.SQLAlchemyError:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Type {} was successfully updated!'.
+                  format(request.form['name']))
+        else:
+            flash('An error occurred. Type {} could not be updated.'.
+                  format(request.form['name']))
+
+        return redirect(url_for('get_type', type_id=type_id))
 
     return app
 

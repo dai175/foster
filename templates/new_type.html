@@ -1,8 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
-    <h3>Create Category</h3>
-    <form class="form" method="post" enctype="multipart/form-data" action="/categories/create">
+    <h3>Create Type</h3>
+    <form class="form" method="post" enctype="multipart/form-data" action="/types/create">
         {{ form.csrf_token }}
+        <div>
+            <label for="category">Category</label>
+            {{ form.category }}
+        </div>
         <div>
             <label for="name">Name</label>
             {{ form.name }}
