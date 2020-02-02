@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h3>Edit Animal</h3>
+    <form class="form" method="post" enctype="multipart/form-data" action="/animal/{{ animal.id }}/edit">
+        {{ form.csrf_token }}
+        <div>
+            <label for="type">Type</label>
+            {{ form.type }}
+        </div>
+        <div>
+            <label for="name">Name</label>
+            {{ form.name(value=animal.name) }}
+        </div>
+        <div>
+            <label for="sex">Sex</label>
+            {{ form.sex(value=animal.sex) }}
+        </div>
+        <div>
+            <label for="date_of_birth">Date of Birth</label>
+            {{ form.date_of_birth(value=animal.date_of_birth) }}
+        </div>
+        <div>
+            <label for="weight">Weight</label>
+            {{ form.weight(value=animal.weight) }}
+        </div>
+        <div>
+            <label for="place_of_birth">Place of Birth</label>
+            {{ form.place_of_birth(value=animal.place_of_birth) }}
+        </div>
+        <div>
+            <label for="description">Description</label>
+            {{ form.description(value=animal.description) }}
+        </div>
+        <div>
+            <label for="image">Image</label>
+            {{ form.image }}
+        </div>
+        <button class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}

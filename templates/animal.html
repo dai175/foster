@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h3>Animal</h3>
+    <ul>
+        <li>
+            <span class="list-heading">Type</span>
+            <span class="list-value">{{ animal.type.name }}</span>
+        </li>
+        <li>
+            <span class="list-heading">ID</span>
+            <span class="list-value">{{ animal.id }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Name</span>
+            <span class="list-value">{{ animal.name }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Sex</span>
+            <span class="list-value">{{ animal.sex }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Date of Birth</span>
+            <span class="list-value">{{ animal.date_of_birth }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Weight</span>
+            <span class="list-value">{{ animal.weight }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Place of Birth</span>
+            <span class="list-value">{{ animal.place_of_birth }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Description</span>
+            <span class="list-value">{% if animal.description %}{{ animal.description }}{% else %}None{% endif %}</span>
+        </li>
+        <li>
+            <span class="list-heading">Image</span>
+            <span class="list-value">{% if animal.image %}{{ animal.image }}{% else %}None{% endif %}</span>
+        </li>
+    </ul>
+    <div>
+        {% if animal.image %}<img src="/static/images/{{ animal.image }}">{% endif %}
+    </div>
+    <div>
+        <a href="/animal/{{ animal.id }}/edit"><button class="btn btn-primary">Edit</button></a>
+    </div>
+{% endblock %}

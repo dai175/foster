@@ -56,10 +56,11 @@ class Animal(db.Model):
                         nullable=False)
 
     def format(self):
+        sex_dict = {1: 'male', 2: 'female'}
         return {
             'id': self.id,
             'name': self.name,
-            'sex': self.sex,
+            'sex': sex_dict[self.sex],
             'date_of_birth': self.date_of_birth,
             'weight': self.weight,
             'place_of_birth': self.place_of_birth,

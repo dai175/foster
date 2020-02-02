@@ -10,8 +10,8 @@ from flask_cors import CORS
 from sqlalchemy import exc
 
 import consts
-from forms import CategoryForm, TypeForm
-from models import db, Category, Type
+from forms import CategoryForm, TypeForm, AnimalForm
+from models import db, Category, Type, Animal
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -24,13 +24,13 @@ migrate = Migrate(app, db)
 CORS(app)
 
 
-def upload_image(file, id):
+def upload_image(file, lead, id):
     image = Image.open(file)
     resize_image = image.resize(
         (int(image.width / image.height * consts.IMAGE_HEIGHT),
          consts.IMAGE_HEIGHT)
     )
-    filename = 'c{}.png'.format(str(id).zfill(consts.NUMBER_OF_DIGITS))
+    filename = '{}{}.png'.format(lead, str(id).zfill(consts.NUMBER_OF_DIGITS))
     resize_image.save(
         os.path.join(app.config['UPLOAD_FOLDER'], filename)
     )
@@ -75,7 +75,9 @@ def create_app(test_config=None):
 
             file = request.files['image']
             if file:
-                filename = upload_image(file, category.id)
+                filename = upload_image(
+                    file, consts.LEAD_CATEGORY, category.id
+                )
                 category.image = filename
                 db.session.commit()
         except exc.SQLAlchemyError:
@@ -122,7 +124,9 @@ def create_app(test_config=None):
 
             file = request.files['image']
             if file:
-                filename = upload_image(file, category_id)
+                filename = upload_image(
+                    file, consts.LEAD_CATEGORY, category_id
+                )
                 category.image = filename
                 db.session.commit()
         except exc.SQLAlchemyError:
@@ -184,7 +188,7 @@ def create_app(test_config=None):
 
             file = request.files['image']
             if file:
-                filename = upload_image(file, type.id)
+                filename = upload_image(file, consts.LEAD_TYPE, type.id)
                 type.image = filename
                 db.session.commit()
         except exc.SQLAlchemyError:
@@ -239,7 +243,7 @@ def create_app(test_config=None):
 
             file = request.files['image']
             if file:
-                filename = upload_image(file, type_id)
+                filename = upload_image(file, consts.LEAD_TYPE, type_id)
                 type.image = filename
                 db.session.commit()
         except exc.SQLAlchemyError:
@@ -256,6 +260,132 @@ def create_app(test_config=None):
                   format(request.form['name']))
 
         return redirect(url_for('get_type', type_id=type_id))
+
+    # ------------------------------------------------------------------------
+    #   Animals
+    # ------------------------------------------------------------------------
+
+    @app.route('/animals')
+    def get_animals():
+        data = []
+        types = Type.query.order_by(Type.id).all()
+        for type in types:
+            animals = Animal.query.filter(Animal.type_id == type.id).all()
+            formatted_animals = [animal.format() for animal in animals]
+            item = type.format()
+            item['animals'] = formatted_animals
+            data.append(item)
+
+        return render_template('animals.html', types=data)
+
+    @app.route('/animals/create', methods=['GET'])
+    def create_animal():
+        types = Type.query.order_by(Type.id).all()
+
+        form = AnimalForm(request.form)
+        form.type.choices = [
+            (type.id, type.name) for type in types
+        ]
+
+        return render_template('new_animal.html', form=form)
+
+    @app.route('/animals/create', methods=['POST'])
+    def create_animal_submission():
+        animal = Animal(
+            type_id=int(request.form['type']),
+            name=request.form['name'],
+            sex=int(request.form['sex']),
+            date_of_birth=request.form['date_of_birth'],
+            weight=request.form['weight'],
+            place_of_birth=request.form['place_of_birth'],
+            description=request.form['description']
+        )
+
+        error = False
+
+        try:
+            db.session.add(animal)
+            db.session.commit()
+
+            file = request.files['image']
+            if file:
+                filename = upload_image(file, consts.LEAD_ANIMAL, animal.id)
+                animal.image = filename
+                db.session.commit()
+        except exc.SQLAlchemyError:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Animal {} was successfully listed!'.
+                  format(request.form['name']))
+        else:
+            flash('An error occurred. Animal {} could not be listed.'.
+                  format(request.form['name']))
+
+        return redirect(url_for('get_animals'))
+
+    @app.route('/animal/<int:animal_id>')
+    def get_animal(animal_id):
+        animal = Animal.query.get(animal_id)
+        data = animal.format()
+        data['type'] = Type.query.get(animal.type_id)
+
+        return render_template('animal.html', animal=data)
+
+    @app.route('/animal/<int:animal_id>/edit', methods=['GET'])
+    def edit_animal(animal_id):
+        types = Type.query.order_by(Type.id).all()
+        animal = Animal.query.get(animal_id)
+        data = animal.format()
+
+        form = AnimalForm(request.form)
+        form.type.choices = [
+            (type.id, type.name) for type in types
+        ]
+        form.type.default = animal.type_id
+        form.sex.default = animal.sex
+        form.process()
+
+        return render_template('edit_animal.html', form=form, animal=data)
+
+    @app.route('/animal/<int:animal_id>/edit', methods=['POST'])
+    def edit_animal_submission(animal_id):
+        animal = Animal.query.get(animal_id)
+        animal.name = request.form['name']
+        animal.sex = request.form['sex']
+        animal.date_of_birth = request.form['date_of_birth']
+        animal.weight = request.form['weight']
+        animal.place_of_birth = request.form['place_of_birth']
+        animal.description = request.form['description']
+        animal.type_id = int(request.form['type'])
+
+        error = False
+
+        try:
+            db.session.commit()
+
+            file = request.files['image']
+            if file:
+                filename = upload_image(file, consts.LEAD_ANIMAL, animal_id)
+                animal.image = filename
+                db.session.commit()
+        except exc.SQLAlchemyError:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Animal {} was successfully updated!'.
+                  format(request.form['name']))
+        else:
+            flash('An error occurred. Animal {} could not be updated.'.
+                  format(request.form['name']))
+
+        return redirect(url_for('get_animal', animal_id=animal_id))
 
     return app
 
