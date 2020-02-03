@@ -44,5 +44,9 @@
     </div>
     <div>
         <a href="/animal/{{ animal.id }}/edit"><button class="btn btn-primary">Edit</button></a>
+        <form action="/animal/{{ animal.id }}/delete">
+            <input type="hidden" name="_method" value="DELETE">
+            <button class="btn btn-primary">Delete</button>
+        </form>
     </div>
 {% endblock %}

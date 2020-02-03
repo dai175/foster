@@ -387,6 +387,34 @@ def create_app(test_config=None):
 
         return redirect(url_for('get_animal', animal_id=animal_id))
 
+    @app.route('/animal/<int:animal_id>/delete', methods=['GET', 'DELETE'])
+    def delete_animal(animal_id):
+        # if request.method != 'DELETE' and \
+        #         request.form.get('_method') != 'DELETE':
+        #     pass
+
+        animal = Animal.query.get(animal_id)
+
+        error = False
+
+        try:
+            db.session.delete(animal)
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Animal {} was successfully deleted!'.
+                  format(animal.name))
+        else:
+            flash('An error occurred. Animal {} could not be deleted.'.
+                  format(animal.name))
+
+        return redirect(url_for('get_animals'))
+
     return app
 
 
