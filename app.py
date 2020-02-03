@@ -144,6 +144,34 @@ def create_app(test_config=None):
 
         return redirect(url_for('get_category', category_id=category_id))
 
+    @app.route('/category/<int:category_id>/delete', methods=['GET', 'DELETE'])
+    def delete_category(category_id):
+        # if request.method != 'DELETE' and \
+        #         request.form.get('_method') != 'DELETE':
+        #     pass
+
+        category = Category.query.get(category_id)
+        category_name = category.name
+        error = False
+
+        try:
+            db.session.delete(category)
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Category {} was successfully deleted!'.
+                  format(category_name))
+        else:
+            flash('An error occurred. Category {} could not be deleted.'.
+                  format(category_name))
+
+        return redirect(url_for('get_categories'))
+
     # ------------------------------------------------------------------------
     #   Types
     # ------------------------------------------------------------------------
@@ -260,6 +288,35 @@ def create_app(test_config=None):
                   format(request.form['name']))
 
         return redirect(url_for('get_type', type_id=type_id))
+
+    @app.route('/type/<int:type_id>/delete', methods=['GET', 'DELETE'])
+    def delete_type(type_id):
+        # if request.method != 'DELETE' and \
+        #         request.form.get('_method') != 'DELETE':
+        #     pass
+
+        type = Type.query.get(type_id)
+        type_name = type.name
+
+        error = False
+
+        try:
+            db.session.delete(type)
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            error = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+
+        if not error:
+            flash('Type {} was successfully deleted!'.
+                  format(type_name))
+        else:
+            flash('An error occurred. Type {} could not be deleted.'.
+                  format(type_name))
+
+        return redirect(url_for('get_types'))
 
     # ------------------------------------------------------------------------
     #   Animals
@@ -394,6 +451,7 @@ def create_app(test_config=None):
         #     pass
 
         animal = Animal.query.get(animal_id)
+        animal_name = animal.name
 
         error = False
 
@@ -408,10 +466,10 @@ def create_app(test_config=None):
 
         if not error:
             flash('Animal {} was successfully deleted!'.
-                  format(animal.name))
+                  format(animal_name))
         else:
             flash('An error occurred. Animal {} could not be deleted.'.
-                  format(animal.name))
+                  format(animal_name))
 
         return redirect(url_for('get_animals'))
 
