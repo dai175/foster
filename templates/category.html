@@ -24,7 +24,7 @@
     </div>
     <div>
         <a href="/category/{{ category.id }}/edit"><button class="btn btn-primary">Edit</button></a>
-        <form action="/category/{{ category.id }}/delete">
+        <form method="post" action="/category/{{ category.id }}/delete">
             <input type="hidden" name="_method" value="DELETE">
             <button class="btn btn-primary">Delete</button>
         </form>

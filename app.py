@@ -111,8 +111,12 @@ def create_app(test_config=None):
 
         return render_template('edit_category.html', form=form, category=data)
 
-    @app.route('/category/<int:category_id>/edit', methods=['POST'])
+    @app.route('/category/<int:category_id>/edit', methods=['POST', 'PATCH'])
     def edit_category_submission(category_id):
+        # if request.method != 'PATCH' and \
+        #         request.form.get('_method') != 'PATCH':
+        #     pass
+
         category = Category.query.get(category_id)
         category.name = request.form['name']
         category.description = request.form['description']
@@ -144,7 +148,8 @@ def create_app(test_config=None):
 
         return redirect(url_for('get_category', category_id=category_id))
 
-    @app.route('/category/<int:category_id>/delete', methods=['GET', 'DELETE'])
+    @app.route('/category/<int:category_id>/delete',
+               methods=['POST', 'DELETE'])
     def delete_category(category_id):
         # if request.method != 'DELETE' and \
         #         request.form.get('_method') != 'DELETE':
@@ -257,8 +262,12 @@ def create_app(test_config=None):
 
         return render_template('edit_type.html', form=form, type=data)
 
-    @app.route('/type/<int:type_id>/edit', methods=['POST'])
+    @app.route('/type/<int:type_id>/edit', methods=['POST', 'PATCH'])
     def edit_type_submission(type_id):
+        # if request.method != 'PATCH' and \
+        #         request.form.get('_method') != 'PATCH':
+        #     pass
+
         type = Type.query.get(type_id)
         type.name = request.form['name']
         type.description = request.form['description']
@@ -289,7 +298,8 @@ def create_app(test_config=None):
 
         return redirect(url_for('get_type', type_id=type_id))
 
-    @app.route('/type/<int:type_id>/delete', methods=['GET', 'DELETE'])
+    @app.route('/type/<int:type_id>/delete',
+               methods=['POST', 'DELETE'])
     def delete_type(type_id):
         # if request.method != 'DELETE' and \
         #         request.form.get('_method') != 'DELETE':
@@ -408,8 +418,12 @@ def create_app(test_config=None):
 
         return render_template('edit_animal.html', form=form, animal=data)
 
-    @app.route('/animal/<int:animal_id>/edit', methods=['POST'])
+    @app.route('/animal/<int:animal_id>/edit', methods=['POST', 'PATCH'])
     def edit_animal_submission(animal_id):
+        # if request.method != 'PATCH' and \
+        #         request.form.get('_method') != 'PATCH':
+        #     pass
+
         animal = Animal.query.get(animal_id)
         animal.name = request.form['name']
         animal.sex = request.form['sex']
@@ -444,7 +458,8 @@ def create_app(test_config=None):
 
         return redirect(url_for('get_animal', animal_id=animal_id))
 
-    @app.route('/animal/<int:animal_id>/delete', methods=['GET', 'DELETE'])
+    @app.route('/animal/<int:animal_id>/delete',
+               methods=['POST', 'DELETE'])
     def delete_animal(animal_id):
         # if request.method != 'DELETE' and \
         #         request.form.get('_method') != 'DELETE':
