@@ -3,7 +3,8 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import Form, BooleanField, StringField, PasswordField, \
     validators, TextAreaField, FieldList, FormField, SelectField, FloatField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import InputRequired, InputRequired
+from wtforms.validators import InputRequired, InputRequired, Regexp, \
+    NumberRange, ValidationError
 
 
 class CategoryForm(FlaskForm):
@@ -33,7 +34,7 @@ class AnimalForm(FlaskForm):
     sex = SelectField('sex', choices=sex_list, default=int,
                       validators=[InputRequired()])
     date_of_birth = DateField('date_of_birth')
-    weight = FloatField('weight')
+    weight = StringField('weight', validators=[Regexp(r'^\d{}\.\d{}')])
     place_of_birth = StringField('place_of_birth')
     description = StringField('description')
     image = FileField('image', validators=[

@@ -41,7 +41,10 @@ def upload_image(file, lead, id):
 def create_app(test_config=None):
     @app.route('/')
     def index():
-        return render_template('index.html')
+        return render_template('index.html',
+                               login=app.config['LOGIN_URI'],
+                               logout=app.config['LOGOUT_URI']
+                               )
 
     # ------------------------------------------------------------------------
     #   Categories
@@ -358,6 +361,10 @@ def create_app(test_config=None):
 
     @app.route('/animals/create', methods=['POST'])
     def create_animal_submission():
+        # form = AnimalForm(request.form)
+        # if not form.validate():
+        #     return render_template('new_animal.html', form=form)
+
         animal = Animal(
             type_id=int(request.form['type']),
             name=request.form['name'],
