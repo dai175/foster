@@ -4,4 +4,13 @@
     <a href="/categories"><button class="btn btn-primary">Categories</button></a>
     <a href="/types"><button class="btn btn-primary">Types</button></a>
     <a href="/animals"><button class="btn btn-primary">Animals</button></a>
+    <script>
+        let param = location.hash.split('&');
+        for (let i = 0; i < param.length; i++) {
+            let paramItem = param[i].split('=');
+            if (paramItem[0] == '#access_token') {
+                localStorage.setItem('token', paramItem[1])
+            }
+        }
+    </script>
 {% endblock %}

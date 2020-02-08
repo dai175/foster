@@ -68,8 +68,8 @@ def create_app(test_config=None):
     # ------------------------------------------------------------------------
 
     @app.route('/categories')
-    @requires_auth()
-    def get_categories():
+    @requires_auth('get:categories')
+    def get_categories(jwt):
         categories = Category.query.order_by(Category.id).all()
         data = [category.format() for category in categories]
 
