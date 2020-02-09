@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
     <p>A place where animals meet foster parents.</p>
-    <a href="/categories"><button class="btn btn-primary">Categories</button></a>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Categories</button></a>
     <a href="/types"><button class="btn btn-primary">Types</button></a>
     <a href="/animals"><button class="btn btn-primary">Animals</button></a>
+    <div id="form"></div>
     <script>
         let param = location.hash.split('&');
         for (let i = 0; i < param.length; i++) {
@@ -12,5 +13,105 @@
                 localStorage.setItem('token', paramItem[1])
             }
         }
+        let jwt = localStorage.getItem('token')
+
+        function get_categories() {
+            fetch('/categories', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + jwt,
+                    'form': document.forms[0]
+                }
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function new_category() {
+            fetch('/categories/create', {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function new_category_submission() {
+            let formData = new FormData(document.forms[0])
+            fetch('/categories/create', {
+                method: 'POST',
+                headers: {'Authorization': 'Bearer ' + jwt},
+                body: formData
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
+        function get_category(category_id) {
+            fetch('/category/' + category_id, {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function edit_category(category_id) {
+            fetch('/category/' + category_id + '/edit', {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function edit_category_submission(category_id) {
+            let formData = new FormData(document.forms[0])
+            fetch('/category/' + category_id + '/edit', {
+                method: 'PATCH',
+                headers: {'Authorization': 'Bearer ' + jwt},
+                body: formData
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
+        function delete_category(category_id) {
+            fetch('/category/' + category_id + '/delete', {
+                method: 'DELETE',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
     </script>
 {% endblock %}

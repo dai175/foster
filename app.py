@@ -73,19 +73,27 @@ def create_app(test_config=None):
         categories = Category.query.order_by(Category.id).all()
         data = [category.format() for category in categories]
 
-        return render_template('categories.html', categories=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/categories.html', categories=data)
+        })
 
     @app.route('/categories/create', methods=['GET'])
-    def create_category():
+    @requires_auth('create:category')
+    def create_category(jwt):
         form = CategoryForm(request.form)
 
-        return render_template('new_category.html', form=form)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/new_category.html', form=form)
+        })
 
     @app.route('/categories/create', methods=['POST'])
-    def create_category_submission():
+    @requires_auth('create:category')
+    def create_category_submission(jwt):
         category = Category(
-            name=request.form['name'],
-            description=request.form['description']
+            name=request.form.get('name'),
+            description=request.form.get('description')
         )
 
         error = False
@@ -114,30 +122,37 @@ def create_app(test_config=None):
             flash('An error occurred. Category {} could not be listed.'.
                   format(request.form['name']))
 
-        return redirect(url_for('get_categories'))
+        return jsonify({
+            'success': not error
+        })
 
     @app.route('/category/<int:category_id>')
-    def get_category(category_id):
+    @requires_auth('get:categories')
+    def get_category(jwt, category_id):
         category = Category.query.get(category_id)
         data = category.format()
 
-        return render_template('category.html', category=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/category.html', category=data)
+        })
 
     @app.route('/category/<int:category_id>/edit', methods=['GET'])
-    def edit_category(category_id):
+    @requires_auth('edit:category')
+    def edit_category(jwt, category_id):
         form = CategoryForm(request.form)
 
         category = Category.query.get(category_id)
         data = category.format()
 
-        return render_template('edit_category.html', form=form, category=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/edit_category.html', form=form, category=data)
+        })
 
-    @app.route('/category/<int:category_id>/edit', methods=['POST', 'PATCH'])
-    def edit_category_submission(category_id):
-        # if request.method != 'PATCH' and \
-        #         request.form.get('_method') != 'PATCH':
-        #     pass
-
+    @app.route('/category/<int:category_id>/edit', methods=['PATCH'])
+    @requires_auth('edit:category')
+    def edit_category_submission(jwt, category_id):
         category = Category.query.get(category_id)
         category.name = request.form['name']
         category.description = request.form['description']
@@ -167,15 +182,13 @@ def create_app(test_config=None):
             flash('An error occurred. Category {} could not be updated.'.
                   format(request.form['name']))
 
-        return redirect(url_for('get_category', category_id=category_id))
+        return jsonify({
+            'success': not error
+        })
 
-    @app.route('/category/<int:category_id>/delete',
-               methods=['POST', 'DELETE'])
-    def delete_category(category_id):
-        # if request.method != 'DELETE' and \
-        #         request.form.get('_method') != 'DELETE':
-        #     pass
-
+    @app.route('/category/<int:category_id>/delete', methods=['DELETE'])
+    @requires_auth('delete:category')
+    def delete_category(jwt, category_id):
         category = Category.query.get(category_id)
         category_name = category.name
         error = False
@@ -196,7 +209,9 @@ def create_app(test_config=None):
             flash('An error occurred. Category {} could not be deleted.'.
                   format(category_name))
 
-        return redirect(url_for('get_categories'))
+        return jsonify({
+            'success': not error
+        })
 
     # ------------------------------------------------------------------------
     #   Types
