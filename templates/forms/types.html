@@ -1,0 +1,14 @@
+<div>
+    <h3>Types</h3>
+    <ul>
+        {% for type in types %}
+        <li>
+            <a href="javascript:get_type({{ type.id }})">{{ type.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="javascript:new_type()"><button class="btn btn-primary">Create</button></a>
+</div>
+<div>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Back</button></a>
+</div>

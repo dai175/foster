@@ -1,7 +1,6 @@
-{% extends "layout.html" %}
-{% block body %}
-    <h3>Create Type</h3>
-    <form class="form" method="post" enctype="multipart/form-data" action="/types/create">
+<div>
+    <h3>Edit Type</h3>
+    <form class="form" method="post" enctype="multipart/form-data" action="javascript:edit_type_submission({{ type.id }})">
         {{ form.csrf_token }}
         <div>
             <label for="category">Category</label>
@@ -9,11 +8,11 @@
         </div>
         <div>
             <label for="name">Name</label>
-            {{ form.name }}
+            {{ form.name(value=type.name) }}
         </div>
         <div>
             <label for="description">Description</label>
-            {{ form.description }}
+            {{ form.description(value=type.description) }}
         </div>
         <div>
             <label for="image">Image</label>
@@ -21,4 +20,7 @@
         </div>
         <button class="btn btn-primary">Submit</button>
     </form>
-{% endblock %}
+</div>
+<div>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Back</button></a>
+</div>

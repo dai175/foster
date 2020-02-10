@@ -3,7 +3,7 @@ import os
 
 from PIL import Image
 from flask import Flask, request, abort, jsonify, render_template, flash, \
-    redirect, url_for
+    redirect, url_for, session
 from flask_migrate import Migrate
 from flask_cors import CORS
 
@@ -57,10 +57,12 @@ def create_app(test_config=None):
 
     @app.route('/callback')
     def callback():
+        session['logged_in'] = True
         return redirect(url_for('index'))
 
     @app.route('/logout')
     def logout():
+        session['logged_in'] = False
         return redirect(url_for('index'))
 
     # ------------------------------------------------------------------------
@@ -217,21 +219,22 @@ def create_app(test_config=None):
     #   Types
     # ------------------------------------------------------------------------
 
-    @app.route('/types')
-    def get_types():
-        data = []
-        categories = Category.query.order_by(Category.id).all()
-        for category in categories:
-            types = Type.query.filter(Type.category_id == category.id).all()
-            formatted_types = [type.format() for type in types]
-            item = category.format()
-            item['types'] = formatted_types
-            data.append(item)
+    @app.route('/types/<int:category_id>')
+    @requires_auth('get:types')
+    def get_types(jwt, category_id):
+        types = Type.query.filter(Type.category_id == category_id).order_by(Type.id).all()
+        data = [type.format() for type in types]
 
-        return render_template('types.html', categories=data)
+        return jsonify({
+            'success': True,
+            'html': render_template(
+                'forms/types.html', types=data, category_id=category_id
+            )
+        })
 
     @app.route('/types/create', methods=['GET'])
-    def create_type():
+    @requires_auth('create:type')
+    def create_type(jwt):
         categories = Category.query.order_by(Category.id).all()
 
         form = TypeForm(request.form)
@@ -239,10 +242,14 @@ def create_app(test_config=None):
             (category.id, category.name) for category in categories
         ]
 
-        return render_template('new_type.html', form=form)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/new_type.html', form=form)
+        })
 
     @app.route('/types/create', methods=['POST'])
-    def create_type_submission():
+    @requires_auth('create:type')
+    def create_type_submission(jwt):
         type = Type(
             category_id=int(request.form['category']),
             name=request.form['name'],
@@ -273,18 +280,25 @@ def create_app(test_config=None):
             flash('An error occurred. Type {} could not be listed.'.
                   format(request.form['name']))
 
-        return redirect(url_for('get_types'))
+        return jsonify({
+            'success': not error
+        })
 
     @app.route('/type/<int:type_id>')
-    def get_type(type_id):
+    @requires_auth('get:types')
+    def get_type(jwt, type_id):
         type = Type.query.get(type_id)
         data = type.format()
         data['category'] = Category.query.get(type.category_id)
 
-        return render_template('type.html', type=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/type.html', type=data)
+        })
 
     @app.route('/type/<int:type_id>/edit', methods=['GET'])
-    def edit_type(type_id):
+    @requires_auth('edit:type')
+    def edit_type(jwt, type_id):
         categories = Category.query.order_by(Category.id).all()
         type = Type.query.get(type_id)
         data = type.format()
@@ -296,14 +310,14 @@ def create_app(test_config=None):
         form.category.default = type.category_id
         form.process()
 
-        return render_template('edit_type.html', form=form, type=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/edit_type.html', form=form, type=data)
+        })
 
-    @app.route('/type/<int:type_id>/edit', methods=['POST', 'PATCH'])
-    def edit_type_submission(type_id):
-        # if request.method != 'PATCH' and \
-        #         request.form.get('_method') != 'PATCH':
-        #     pass
-
+    @app.route('/type/<int:type_id>/edit', methods=['PATCH'])
+    @requires_auth('edit:type')
+    def edit_type_submission(jwt, type_id):
         type = Type.query.get(type_id)
         type.name = request.form['name']
         type.description = request.form['description']
@@ -332,15 +346,13 @@ def create_app(test_config=None):
             flash('An error occurred. Type {} could not be updated.'.
                   format(request.form['name']))
 
-        return redirect(url_for('get_type', type_id=type_id))
+        return jsonify({
+            'success': not error
+        })
 
-    @app.route('/type/<int:type_id>/delete',
-               methods=['POST', 'DELETE'])
-    def delete_type(type_id):
-        # if request.method != 'DELETE' and \
-        #         request.form.get('_method') != 'DELETE':
-        #     pass
-
+    @app.route('/type/<int:type_id>/delete', methods=['DELETE'])
+    @requires_auth('delete:type')
+    def delete_type(jwt, type_id):
         type = Type.query.get(type_id)
         type_name = type.name
 
@@ -362,7 +374,9 @@ def create_app(test_config=None):
             flash('An error occurred. Type {} could not be deleted.'.
                   format(type_name))
 
-        return redirect(url_for('get_types'))
+        return jsonify({
+            'success': not error
+        })
 
     # ------------------------------------------------------------------------
     #   Animals

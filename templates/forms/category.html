@@ -1,26 +1,30 @@
-<h3>Category</h3>
-<ul>
-    <li>
-        <span class="list-heading">ID</span>
-        <span class="list-value">{{ category.id }}</span>
-    </li>
-    <li>
-        <span class="list-heading">Name</span>
-        <span class="list-value">{{ category.name }}</span>
-    </li>
-    <li>
-        <span class="list-heading">Description</span>
-        <span class="list-value">{% if category.description %}{{ category.description }}{% else %}None{% endif %}</span>
-    </li>
-    <li>
-        <span class="list-heading">Image</span>
-        <span class="list-value">{% if category.image %}{{ category.image }}{% else %}None{% endif %}</span>
-    </li>
-</ul>
 <div>
-    {% if category.image %}<img src="/static/images/{{ category.image }}">{% endif %}
-</div>
-<div>
+    <h3>Category</h3>
+    <ul>
+        <li>
+            <span class="list-heading">ID</span>
+            <span class="list-value">{{ category.id }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Name</span>
+            <span class="list-value">{{ category.name }}</span>
+        </li>
+        <li>
+            <span class="list-heading">Description</span>
+            <span class="list-value">{% if category.description %}{{ category.description }}{% else %}None{% endif %}</span>
+        </li>
+        <li>
+            <span class="list-heading">Image</span>
+            <span class="list-value">{% if category.image %}{{ category.image }}{% else %}None{% endif %}</span>
+        </li>
+    </ul>
+    <div>
+        {% if category.image %}<img src="/static/images/{{ category.image }}">{% endif %}
+    </div>
+    <a href="javascript:get_types({{ category.id }})"><button class="btn btn-primary">Types</button></a>
     <a href="javascript:edit_category({{ category.id }})"><button class="btn btn-primary">Edit</button></a>
     <a href="javascript:delete_category({{ category.id }})"><button class="btn btn-primary">Delete</button></a>
+</div>
+<div>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Back</button></a>
 </div>

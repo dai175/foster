@@ -1,20 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
-    <p>A place where animals meet foster parents.</p>
-    <a href="javascript:get_categories()"><button class="btn btn-primary">Categories</button></a>
-    <a href="/types"><button class="btn btn-primary">Types</button></a>
-    <a href="/animals"><button class="btn btn-primary">Animals</button></a>
     <div id="form"></div>
     <script>
-        let param = location.hash.split('&');
-        for (let i = 0; i < param.length; i++) {
-            let paramItem = param[i].split('=');
-            if (paramItem[0] == '#access_token') {
-                localStorage.setItem('token', paramItem[1])
-            }
-        }
-        let jwt = localStorage.getItem('token')
-
+        /* -------------------------------------------------------------------
+            categories
+        ------------------------------------------------------------------- */
         function get_categories() {
             fetch('/categories', {
                 method: 'GET',
@@ -102,6 +92,107 @@
 
         function delete_category(category_id) {
             fetch('/category/' + category_id + '/delete', {
+                method: 'DELETE',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
+        /* -------------------------------------------------------------------
+            types
+        ------------------------------------------------------------------- */
+        function get_types(category_id) {
+            fetch('/types/' + category_id, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + jwt,
+                    'form': document.forms[0]
+                }
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function new_type() {
+            fetch('/types/create', {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function new_type_submission() {
+            let formData = new FormData(document.forms[0])
+            fetch('/types/create', {
+                method: 'POST',
+                headers: {'Authorization': 'Bearer ' + jwt},
+                body: formData
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
+        function get_type(type_id) {
+            fetch('/type/' + type_id, {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function edit_type(type_id) {
+            fetch('/type/' + type_id + '/edit', {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function edit_type_submission(type_id) {
+            let formData = new FormData(document.forms[0])
+            fetch('/type/' + type_id + '/edit', {
+                method: 'PATCH',
+                headers: {'Authorization': 'Bearer ' + jwt},
+                body: formData
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
+        function delete_type(type_id) {
+            fetch('/type/' + type_id + '/delete', {
                 method: 'DELETE',
                 headers: {'Authorization': 'Bearer ' + jwt}
             })

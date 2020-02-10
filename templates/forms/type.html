@@ -1,5 +1,4 @@
-{% extends "layout.html" %}
-{% block body %}
+<div>
     <h3>Type</h3>
     <ul>
         <li>
@@ -26,11 +25,10 @@
     <div>
         {% if type.image %}<img src="/static/images/{{ type.image }}">{% endif %}
     </div>
-    <div>
-        <a href="/type/{{ type.id }}/edit"><button class="btn btn-primary">Edit</button></a>
-        <form method="post" action="/type/{{ type.id }}/delete">
-            <input type="hidden" name="_method" value="DELETE">
-            <button class="btn btn-primary">Delete</button>
-        </form>
-    </div>
-{% endblock %}
+    <a href="javascript:get_animals({{ type.id }})"><button class="btn btn-primary">Animals</button></a>
+    <a href="javascript:edit_type({{ type.id }})"><button class="btn btn-primary">Edit</button></a>
+    <a href="javascript:delete_type({{ type.id }})"><button class="btn btn-primary">Delete</button></a>
+</div>
+<div>
+    <a href="javascript:get_types({{ type.category.id }})"><button class="btn btn-primary">Back</button></a>
+</div>

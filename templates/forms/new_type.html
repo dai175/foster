@@ -1,7 +1,6 @@
-{% extends "layout.html" %}
-{% block body %}
-    <h3>Edit Type</h3>
-    <form class="form" method="post" enctype="multipart/form-data" action="/type/{{ type.id }}/edit">
+<div>
+    <h3>Create Type</h3>
+    <form class="form" method="post" enctype="multipart/form-data" action="javascript:new_type_submission()">
         {{ form.csrf_token }}
         <div>
             <label for="category">Category</label>
@@ -9,17 +8,19 @@
         </div>
         <div>
             <label for="name">Name</label>
-            {{ form.name(value=type.name) }}
+            {{ form.name }}
         </div>
         <div>
             <label for="description">Description</label>
-            {{ form.description(value=type.description) }}
+            {{ form.description }}
         </div>
         <div>
             <label for="image">Image</label>
             {{ form.image }}
         </div>
-        <input type="hidden" name="_method" value="PATCH">
         <button class="btn btn-primary">Submit</button>
     </form>
-{% endblock %}
+</div>
+<div>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Back</button></a>
+</div>
