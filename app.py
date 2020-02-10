@@ -8,7 +8,6 @@ from flask import Flask, request, abort, jsonify, render_template, flash, \
 from flask_migrate import Migrate
 from flask_cors import CORS
 
-# create and configure the app
 from sqlalchemy import exc
 
 import consts
@@ -74,7 +73,11 @@ def create_app(test_config=None):
     @app.route('/categories')
     @requires_auth('get:categories')
     def get_categories(jwt):
-        categories = Category.query.order_by(Category.id).all()
+        try:
+            categories = Category.query.order_by(Category.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = [category.format() for category in categories]
 
         return jsonify({
@@ -133,7 +136,11 @@ def create_app(test_config=None):
     @app.route('/category/<int:category_id>')
     @requires_auth('get:categories')
     def get_category(jwt, category_id):
-        category = Category.query.get(category_id)
+        try:
+            category = Category.query.get(category_id)
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = category.format()
 
         return jsonify({
@@ -146,7 +153,11 @@ def create_app(test_config=None):
     def edit_category(jwt, category_id):
         form = CategoryForm(request.form)
 
-        category = Category.query.get(category_id)
+        try:
+            category = Category.query.get(category_id)
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = category.format()
 
         return jsonify({
@@ -159,13 +170,12 @@ def create_app(test_config=None):
     @app.route('/category/<int:category_id>/edit', methods=['PATCH'])
     @requires_auth('edit:category')
     def edit_category_submission(jwt, category_id):
-        category = Category.query.get(category_id)
-        category.name = request.form['name']
-        category.description = request.form['description']
-
         error = False
 
         try:
+            category = Category.query.get(category_id)
+            category.name = request.form['name']
+            category.description = request.form['description']
             db.session.commit()
 
             file = request.files['image']
@@ -195,11 +205,11 @@ def create_app(test_config=None):
     @app.route('/category/<int:category_id>/delete', methods=['DELETE'])
     @requires_auth('delete:category')
     def delete_category(jwt, category_id):
-        category = Category.query.get(category_id)
-        category_name = category.name
         error = False
 
         try:
+            category = Category.query.get(category_id)
+            category_name = category.name
             db.session.delete(category)
             db.session.commit()
         except exc.SQLAlchemyError:
@@ -226,8 +236,12 @@ def create_app(test_config=None):
     @app.route('/types/<int:category_id>')
     @requires_auth('get:types')
     def get_types(jwt, category_id):
-        types = Type.query.filter(Type.category_id == category_id).\
-            order_by(Type.id).all()
+        try:
+            types = Type.query.filter(Type.category_id == category_id).\
+                order_by(Type.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = [type.format() for type in types]
 
         return jsonify({
@@ -238,7 +252,10 @@ def create_app(test_config=None):
     @app.route('/types/create', methods=['GET'])
     @requires_auth('create:type')
     def create_type(jwt):
-        categories = Category.query.order_by(Category.id).all()
+        try:
+            categories = Category.query.order_by(Category.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
 
         form = TypeForm(request.form)
         form.category.choices = [
@@ -290,9 +307,14 @@ def create_app(test_config=None):
     @app.route('/type/<int:type_id>')
     @requires_auth('get:types')
     def get_type(jwt, type_id):
-        type = Type.query.get(type_id)
+        try:
+            type = Type.query.get(type_id)
+            category = Category.query.get(type.category_id)
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = type.format()
-        data['category'] = Category.query.get(type.category_id)
+        data['category'] = category
 
         return jsonify({
             'success': True,
@@ -302,8 +324,12 @@ def create_app(test_config=None):
     @app.route('/type/<int:type_id>/edit', methods=['GET'])
     @requires_auth('edit:type')
     def edit_type(jwt, type_id):
-        categories = Category.query.order_by(Category.id).all()
-        type = Type.query.get(type_id)
+        try:
+            categories = Category.query.order_by(Category.id).all()
+            type = Type.query.get(type_id)
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = type.format()
 
         form = TypeForm(request.form)
@@ -323,14 +349,13 @@ def create_app(test_config=None):
     @app.route('/type/<int:type_id>/edit', methods=['PATCH'])
     @requires_auth('edit:type')
     def edit_type_submission(jwt, type_id):
-        type = Type.query.get(type_id)
-        type.name = request.form['name']
-        type.description = request.form['description']
-        type.category_id = int(request.form['category'])
-
         error = False
 
         try:
+            type = Type.query.get(type_id)
+            type.name = request.form['name']
+            type.description = request.form['description']
+            type.category_id = int(request.form['category'])
             db.session.commit()
 
             file = request.files['image']
@@ -358,12 +383,11 @@ def create_app(test_config=None):
     @app.route('/type/<int:type_id>/delete', methods=['DELETE'])
     @requires_auth('delete:type')
     def delete_type(jwt, type_id):
-        type = Type.query.get(type_id)
-        type_name = type.name
-
         error = False
 
         try:
+            type = Type.query.get(type_id)
+            type_name = type.name
             db.session.delete(type)
             db.session.commit()
         except exc.SQLAlchemyError:
@@ -390,8 +414,12 @@ def create_app(test_config=None):
     @app.route('/animals/<int:type_id>')
     @requires_auth('get:animals')
     def get_animals(jwt, type_id):
-        animals = Animal.query.filter(Animal.type_id == type_id).\
-            order_by(Animal.id).all()
+        try:
+            animals = Animal.query.filter(Animal.type_id == type_id).\
+                order_by(Animal.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = [animal.format() for animal in animals]
 
         return jsonify({
@@ -402,7 +430,10 @@ def create_app(test_config=None):
     @app.route('/animals/create', methods=['GET'])
     @requires_auth('create:animal')
     def create_animal(jwt):
-        types = Type.query.order_by(Type.id).all()
+        try:
+            types = Type.query.order_by(Type.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
 
         form = AnimalForm(request.form)
         form.type.choices = [
@@ -458,9 +489,14 @@ def create_app(test_config=None):
     @app.route('/animal/<int:animal_id>')
     @requires_auth('get:animals')
     def get_animal(jwt, animal_id):
-        animal = Animal.query.get(animal_id)
+        try:
+            animal = Animal.query.get(animal_id)
+            type = Type.query.get(animal.type_id)
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = animal.format()
-        data['type'] = Type.query.get(animal.type_id)
+        data['type'] = type
 
         return jsonify({
             'success': True,
@@ -470,8 +506,12 @@ def create_app(test_config=None):
     @app.route('/animal/<int:animal_id>/edit', methods=['GET'])
     @requires_auth('edit:animal')
     def edit_animal(jwt, animal_id):
-        types = Type.query.order_by(Type.id).all()
-        animal = Animal.query.get(animal_id)
+        try:
+            types = Type.query.order_by(Type.id).all()
+            animal = Animal.query.get(animal_id)
+        except exc.SQLAlchemyError:
+            abort(422)
+
         data = animal.format()
 
         form = AnimalForm(request.form)
@@ -491,18 +531,17 @@ def create_app(test_config=None):
     @app.route('/animal/<int:animal_id>/edit', methods=['PATCH'])
     @requires_auth('edit:animal')
     def edit_animal_submission(jwt, animal_id):
-        animal = Animal.query.get(animal_id)
-        animal.name = request.form['name']
-        animal.sex = request.form['sex']
-        animal.date_of_birth = request.form['date_of_birth']
-        animal.weight = request.form['weight']
-        animal.place_of_birth = request.form['place_of_birth']
-        animal.description = request.form['description']
-        animal.type_id = int(request.form['type'])
-
         error = False
 
         try:
+            animal = Animal.query.get(animal_id)
+            animal.name = request.form['name']
+            animal.sex = request.form['sex']
+            animal.date_of_birth = request.form['date_of_birth']
+            animal.weight = request.form['weight']
+            animal.place_of_birth = request.form['place_of_birth']
+            animal.description = request.form['description']
+            animal.type_id = int(request.form['type'])
             db.session.commit()
 
             file = request.files['image']
@@ -530,12 +569,11 @@ def create_app(test_config=None):
     @app.route('/animal/<int:animal_id>/delete', methods=['DELETE'])
     @requires_auth('delete:animal')
     def delete_animal(jwt, animal_id):
-        animal = Animal.query.get(animal_id)
-        animal_name = animal.name
-
         error = False
 
         try:
+            animal = Animal.query.get(animal_id)
+            animal_name = animal.name
             db.session.delete(animal)
             db.session.commit()
         except exc.SQLAlchemyError:
