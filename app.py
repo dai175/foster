@@ -1,5 +1,6 @@
 import json
 import os
+from urllib.parse import urlencode
 
 from PIL import Image
 from flask import Flask, request, abort, jsonify, render_template, flash, \
@@ -51,9 +52,7 @@ def upload_image(file, lead, id):
 def create_app(test_config=None):
     @app.route('/')
     def index():
-        return render_template('index.html',
-                               login=app.config['LOGIN_URI']
-                               )
+        return render_template('index.html', login=app.config['LOGIN_URI'])
 
     @app.route('/callback')
     def callback():
@@ -62,8 +61,11 @@ def create_app(test_config=None):
 
     @app.route('/logout')
     def logout():
-        session['logged_in'] = False
-        return redirect(url_for('index'))
+        session.clear()
+        params = {'returnTo': url_for('index', _external=True),
+                  'client_id': app.config['CLIENT_ID']}
+        return redirect('https://{}/v2/logout?{}'.
+                        format(app.config['AUTH0_DOMAIN'], urlencode(params)))
 
     # ------------------------------------------------------------------------
     #   Categories
@@ -149,7 +151,9 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/edit_category.html', form=form, category=data)
+            'html': render_template(
+                'forms/edit_category.html', form=form, category=data
+            )
         })
 
     @app.route('/category/<int:category_id>/edit', methods=['PATCH'])
@@ -222,7 +226,8 @@ def create_app(test_config=None):
     @app.route('/types/<int:category_id>')
     @requires_auth('get:types')
     def get_types(jwt, category_id):
-        types = Type.query.filter(Type.category_id == category_id).order_by(Type.id).all()
+        types = Type.query.filter(Type.category_id == category_id).\
+            order_by(Type.id).all()
         data = [type.format() for type in types]
 
         return jsonify({
@@ -310,7 +315,9 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/edit_type.html', form=form, type=data)
+            'html': render_template(
+                'forms/edit_type.html', form=form, type=data
+            )
         })
 
     @app.route('/type/<int:type_id>/edit', methods=['PATCH'])
@@ -383,7 +390,8 @@ def create_app(test_config=None):
     @app.route('/animals/<int:type_id>')
     @requires_auth('get:animals')
     def get_animals(jwt, type_id):
-        animals = Animal.query.filter(Animal.type_id == type_id).order_by(Animal.id).all()
+        animals = Animal.query.filter(Animal.type_id == type_id).\
+            order_by(Animal.id).all()
         data = [animal.format() for animal in animals]
 
         return jsonify({
@@ -475,7 +483,9 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/edit_animal.html', form=form, animal=data)
+            'html': render_template(
+                'forms/edit_animal.html', form=form, animal=data
+            )
         })
 
     @app.route('/animal/<int:animal_id>/edit', methods=['PATCH'])
