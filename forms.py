@@ -34,9 +34,10 @@ class AnimalForm(FlaskForm):
     sex = SelectField('sex', choices=sex_list, default=int,
                       validators=[InputRequired()])
     date_of_birth = DateField('date_of_birth')
-    weight = StringField('weight', validators=[Regexp(r'^\d{}\.\d{}')])
+    weight = StringField('weight', validators=[Regexp(r'^\d+\.?\d*$')])
     place_of_birth = StringField('place_of_birth')
     description = StringField('description')
     image = FileField('image', validators=[
         FileAllowed(['jpg', 'png'], 'Images only!')
     ])
+

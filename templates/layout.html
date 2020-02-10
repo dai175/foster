@@ -17,7 +17,7 @@
         {% endif %}
         </div>
         {% for message in get_flashed_messages() %}
-            <div class="alert alert-primary" role="alert">{{ message }}</div>
+            <div id="messages" class="alert alert-primary" role="alert">{{ message }}</div>
         {% endfor %}
         <div id="main">
             {% block body %}{% endblock %}

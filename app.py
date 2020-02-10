@@ -98,6 +98,12 @@ def create_app(test_config=None):
     @app.route('/categories/create', methods=['POST'])
     @requires_auth('create:category')
     def create_category_submission(jwt):
+        form = CategoryForm()
+        if not form.validate_on_submit():
+            return jsonify({
+                'success': False
+            })
+
         category = Category(
             name=request.form.get('name'),
             description=request.form.get('description')
@@ -170,6 +176,12 @@ def create_app(test_config=None):
     @app.route('/category/<int:category_id>/edit', methods=['PATCH'])
     @requires_auth('edit:category')
     def edit_category_submission(jwt, category_id):
+        form = CategoryForm()
+        if not form.validate_on_submit():
+            return jsonify({
+                'success': False
+            })
+
         error = False
 
         try:
@@ -270,6 +282,21 @@ def create_app(test_config=None):
     @app.route('/types/create', methods=['POST'])
     @requires_auth('create:type')
     def create_type_submission(jwt):
+        try:
+            categories = Category.query.order_by(Category.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
+
+        form = TypeForm()
+        form.category.choices = [
+            (category.id, category.name) for category in categories
+        ]
+
+        if not form.validate_on_submit():
+            return jsonify({
+                'success': False
+            })
+
         type = Type(
             category_id=int(request.form['category']),
             name=request.form['name'],
@@ -349,6 +376,21 @@ def create_app(test_config=None):
     @app.route('/type/<int:type_id>/edit', methods=['PATCH'])
     @requires_auth('edit:type')
     def edit_type_submission(jwt, type_id):
+        try:
+            categories = Category.query.order_by(Category.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
+
+        form = TypeForm()
+        form.category.choices = [
+            (category.id, category.name) for category in categories
+        ]
+
+        if not form.validate_on_submit():
+            return jsonify({
+                'success': False
+            })
+
         error = False
 
         try:
@@ -448,6 +490,20 @@ def create_app(test_config=None):
     @app.route('/animals/create', methods=['POST'])
     @requires_auth('create:animal')
     def create_animal_submission(jwt):
+        try:
+            types = Type.query.order_by(Type.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
+
+        form = AnimalForm()
+        form.type.choices = [
+            (type.id, type.name) for type in types
+        ]
+        if not form.validate_on_submit():
+            return jsonify({
+                'success': False
+            })
+
         animal = Animal(
             type_id=int(request.form['type']),
             name=request.form['name'],
@@ -531,6 +587,20 @@ def create_app(test_config=None):
     @app.route('/animal/<int:animal_id>/edit', methods=['PATCH'])
     @requires_auth('edit:animal')
     def edit_animal_submission(jwt, animal_id):
+        try:
+            types = Type.query.order_by(Type.id).all()
+        except exc.SQLAlchemyError:
+            abort(422)
+
+        form = AnimalForm()
+        form.type.choices = [
+            (type.id, type.name) for type in types
+        ]
+        if not form.validate_on_submit():
+            return jsonify({
+                'success': False
+            })
+
         error = False
 
         try:
