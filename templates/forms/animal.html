@@ -1,5 +1,4 @@
-{% extends "layout.html" %}
-{% block body %}
+<div>
     <h3>Animal</h3>
     <ul>
         <li>
@@ -43,10 +42,10 @@
         {% if animal.image %}<img src="/static/images/{{ animal.image }}">{% endif %}
     </div>
     <div>
-        <a href="/animal/{{ animal.id }}/edit"><button class="btn btn-primary">Edit</button></a>
-        <form method="post" action="/animal/{{ animal.id }}/delete">
-            <input type="hidden" name="_method" value="DELETE">
-            <button class="btn btn-primary">Delete</button>
-        </form>
+        <a href="javascript:edit_animal({{ animal.id }})"><button class="btn btn-primary">Edit</button></a>
+        <a href="javascript:delete_animal({{ animal.id }})"><button class="btn btn-primary">Delete</button></a>
     </div>
-{% endblock %}
+</div>
+<div>
+    <a href="javascript:get_animals({{ animal.type.id }})"><button class="btn btn-primary">Back</button></a>
+</div>

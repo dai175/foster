@@ -1,7 +1,6 @@
-{% extends "layout.html" %}
-{% block body %}
+<div>
     <h3>Edit Animal</h3>
-    <form class="form" method="post" enctype="multipart/form-data" action="/animal/{{ animal.id }}/edit">
+    <form class="form" method="post" enctype="multipart/form-data" action="javascript:edit_animal_submission({{ animal.id }})">
         {{ form.csrf_token }}
         <div>
             <label for="type">Type</label>
@@ -35,7 +34,9 @@
             <label for="image">Image</label>
             {{ form.image }}
         </div>
-        <input type="hidden" name="_method" value="PATCH">
         <button class="btn btn-primary">Submit</button>
     </form>
-{% endblock %}
+</div>
+<div>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Back</button></a>
+</div>

@@ -1,7 +1,6 @@
-{% extends "layout.html" %}
-{% block body %}
+<div>
     <h3>Create Animal</h3>
-    <form class="form" method="post" enctype="multipart/form-data" action="/animals/create">
+    <form class="form" method="post" enctype="multipart/form-data" action="javascript:new_animal_submission()">
         {{ form.csrf_token }}
         <div>
             <label for="type">Type</label>
@@ -37,4 +36,7 @@
         </div>
         <button class="btn btn-primary">Submit</button>
     </form>
-{% endblock %}
+</div>
+<div>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Back</button></a>
+</div>

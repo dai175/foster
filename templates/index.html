@@ -204,5 +204,106 @@
             })
         }
 
+        /* -------------------------------------------------------------------
+            Animals
+        ------------------------------------------------------------------- */
+        function get_animals(type_id) {
+            fetch('/animals/' + type_id, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + jwt,
+                    'form': document.forms[0]
+                }
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function new_animal() {
+            fetch('/animals/create', {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function new_animal_submission() {
+            let formData = new FormData(document.forms[0])
+            fetch('/animals/create', {
+                method: 'POST',
+                headers: {'Authorization': 'Bearer ' + jwt},
+                body: formData
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
+        function get_animal(animal_id) {
+            fetch('/animal/' + animal_id, {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function edit_animal(animal_id) {
+            fetch('/animal/' + animal_id + '/edit', {
+                method: 'GET',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                document.getElementById('form').innerHTML = myJson['html']
+            })
+        }
+
+        function edit_animal_submission(animal_id) {
+            let formData = new FormData(document.forms[0])
+            fetch('/animal/' + animal_id + '/edit', {
+                method: 'PATCH',
+                headers: {'Authorization': 'Bearer ' + jwt},
+                body: formData
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
+        function delete_animal(animal_id) {
+            fetch('/animal/' + animal_id + '/delete', {
+                method: 'DELETE',
+                headers: {'Authorization': 'Bearer ' + jwt}
+            })
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (myJson) {
+                location.reload()
+            })
+        }
+
     </script>
 {% endblock %}

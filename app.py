@@ -227,9 +227,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template(
-                'forms/types.html', types=data, category_id=category_id
-            )
+            'html': render_template('forms/types.html', types=data)
         })
 
     @app.route('/types/create', methods=['GET'])
@@ -382,21 +380,20 @@ def create_app(test_config=None):
     #   Animals
     # ------------------------------------------------------------------------
 
-    @app.route('/animals')
-    def get_animals():
-        data = []
-        types = Type.query.order_by(Type.id).all()
-        for type in types:
-            animals = Animal.query.filter(Animal.type_id == type.id).all()
-            formatted_animals = [animal.format() for animal in animals]
-            item = type.format()
-            item['animals'] = formatted_animals
-            data.append(item)
+    @app.route('/animals/<int:type_id>')
+    @requires_auth('get:animals')
+    def get_animals(jwt, type_id):
+        animals = Animal.query.filter(Animal.type_id == type_id).order_by(Animal.id).all()
+        data = [animal.format() for animal in animals]
 
-        return render_template('animals.html', types=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/animals.html', animals=data)
+        })
 
     @app.route('/animals/create', methods=['GET'])
-    def create_animal():
+    @requires_auth('create:animal')
+    def create_animal(jwt):
         types = Type.query.order_by(Type.id).all()
 
         form = AnimalForm(request.form)
@@ -404,14 +401,14 @@ def create_app(test_config=None):
             (type.id, type.name) for type in types
         ]
 
-        return render_template('new_animal.html', form=form)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/new_animal.html', form=form)
+        })
 
     @app.route('/animals/create', methods=['POST'])
-    def create_animal_submission():
-        # form = AnimalForm(request.form)
-        # if not form.validate():
-        #     return render_template('new_animal.html', form=form)
-
+    @requires_auth('create:animal')
+    def create_animal_submission(jwt):
         animal = Animal(
             type_id=int(request.form['type']),
             name=request.form['name'],
@@ -446,18 +443,25 @@ def create_app(test_config=None):
             flash('An error occurred. Animal {} could not be listed.'.
                   format(request.form['name']))
 
-        return redirect(url_for('get_animals'))
+        return jsonify({
+            'success': not error
+        })
 
     @app.route('/animal/<int:animal_id>')
-    def get_animal(animal_id):
+    @requires_auth('get:animals')
+    def get_animal(jwt, animal_id):
         animal = Animal.query.get(animal_id)
         data = animal.format()
         data['type'] = Type.query.get(animal.type_id)
 
-        return render_template('animal.html', animal=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/animal.html', animal=data)
+        })
 
     @app.route('/animal/<int:animal_id>/edit', methods=['GET'])
-    def edit_animal(animal_id):
+    @requires_auth('edit:animal')
+    def edit_animal(jwt, animal_id):
         types = Type.query.order_by(Type.id).all()
         animal = Animal.query.get(animal_id)
         data = animal.format()
@@ -467,17 +471,16 @@ def create_app(test_config=None):
             (type.id, type.name) for type in types
         ]
         form.type.default = animal.type_id
-        form.sex.default = animal.sex
         form.process()
 
-        return render_template('edit_animal.html', form=form, animal=data)
+        return jsonify({
+            'success': True,
+            'html': render_template('forms/edit_animal.html', form=form, animal=data)
+        })
 
-    @app.route('/animal/<int:animal_id>/edit', methods=['POST', 'PATCH'])
-    def edit_animal_submission(animal_id):
-        # if request.method != 'PATCH' and \
-        #         request.form.get('_method') != 'PATCH':
-        #     pass
-
+    @app.route('/animal/<int:animal_id>/edit', methods=['PATCH'])
+    @requires_auth('edit:animal')
+    def edit_animal_submission(jwt, animal_id):
         animal = Animal.query.get(animal_id)
         animal.name = request.form['name']
         animal.sex = request.form['sex']
@@ -510,15 +513,13 @@ def create_app(test_config=None):
             flash('An error occurred. Animal {} could not be updated.'.
                   format(request.form['name']))
 
-        return redirect(url_for('get_animal', animal_id=animal_id))
+        return jsonify({
+            'success': not error
+        })
 
-    @app.route('/animal/<int:animal_id>/delete',
-               methods=['POST', 'DELETE'])
-    def delete_animal(animal_id):
-        # if request.method != 'DELETE' and \
-        #         request.form.get('_method') != 'DELETE':
-        #     pass
-
+    @app.route('/animal/<int:animal_id>/delete', methods=['DELETE'])
+    @requires_auth('delete:animal')
+    def delete_animal(jwt, animal_id):
         animal = Animal.query.get(animal_id)
         animal_name = animal.name
 
@@ -540,7 +541,9 @@ def create_app(test_config=None):
             flash('An error occurred. Animal {} could not be deleted.'.
                   format(animal_name))
 
-        return redirect(url_for('get_animals'))
+        return jsonify({
+            'success': not error
+        })
 
     return app
 

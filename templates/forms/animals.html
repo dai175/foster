@@ -1,0 +1,14 @@
+<div>
+    <h3>Animals</h3>
+    <ul>
+        {% for animal in animals %}
+        <li>
+            <a href="javascript:get_animal({{ animal.id }})">{{ animal.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="javascript:new_animal()"><button class="btn btn-primary">Create</button></a>
+</div>
+<div>
+    <a href="javascript:get_categories()"><button class="btn btn-primary">Back</button></a>
+</div>
