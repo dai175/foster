@@ -1,13 +1,11 @@
-import json
 import os
 from urllib.parse import urlencode
 
 from PIL import Image
 from flask import Flask, request, abort, jsonify, render_template, flash, \
     redirect, url_for, session
-from flask_migrate import Migrate
 from flask_cors import CORS
-
+from flask_migrate import Migrate
 from sqlalchemy import exc
 
 import consts
@@ -45,7 +43,7 @@ def upload_image(file, lead, id):
 
 
 # ------------------------------------------------------------------------
-#   Main
+#   Login and Logout
 # ------------------------------------------------------------------------
 
 def create_app(test_config=None):
@@ -82,7 +80,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/categories.html', categories=data)
+            'form': render_template('forms/categories.html', categories=data)
         })
 
     @app.route('/categories/create', methods=['GET'])
@@ -92,7 +90,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/new_category.html', form=form)
+            'form': render_template('forms/new_category.html', form=form)
         })
 
     @app.route('/categories/create', methods=['POST'])
@@ -151,7 +149,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/category.html', category=data)
+            'form': render_template('forms/category.html', category=data)
         })
 
     @app.route('/category/<int:category_id>/edit', methods=['GET'])
@@ -168,7 +166,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template(
+            'form': render_template(
                 'forms/edit_category.html', form=form, category=data
             )
         })
@@ -258,7 +256,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/types.html', types=data)
+            'form': render_template('forms/types.html', types=data)
         })
 
     @app.route('/types/create', methods=['GET'])
@@ -276,7 +274,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/new_type.html', form=form)
+            'form': render_template('forms/new_type.html', form=form)
         })
 
     @app.route('/types/create', methods=['POST'])
@@ -345,7 +343,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/type.html', type=data)
+            'form': render_template('forms/type.html', type=data)
         })
 
     @app.route('/type/<int:type_id>/edit', methods=['GET'])
@@ -368,7 +366,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template(
+            'form': render_template(
                 'forms/edit_type.html', form=form, type=data
             )
         })
@@ -466,7 +464,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/animals.html', animals=data)
+            'form': render_template('forms/animals.html', animals=data)
         })
 
     @app.route('/animals/create', methods=['GET'])
@@ -484,7 +482,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/new_animal.html', form=form)
+            'form': render_template('forms/new_animal.html', form=form)
         })
 
     @app.route('/animals/create', methods=['POST'])
@@ -556,7 +554,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template('forms/animal.html', animal=data)
+            'form': render_template('forms/animal.html', animal=data)
         })
 
     @app.route('/animal/<int:animal_id>/edit', methods=['GET'])
@@ -579,7 +577,7 @@ def create_app(test_config=None):
 
         return jsonify({
             'success': True,
-            'html': render_template(
+            'form': render_template(
                 'forms/edit_animal.html', form=form, animal=data
             )
         })
@@ -662,6 +660,42 @@ def create_app(test_config=None):
         return jsonify({
             'success': not error
         })
+
+    # ------------------------------------------------------------------------
+    #   Error handler
+    # ------------------------------------------------------------------------
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            'success': False,
+            'error': 400,
+            'message': 'Bad Request'
+        }), 400
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'Not Found'
+        }), 404
+
+    @app.errorhandler(422)
+    def unprocessable_entity(error):
+        return jsonify({
+            'success': False,
+            'error': 422,
+            'message': 'Unprocessable Entity'
+        }), 422
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            'success': False,
+            'error': 500,
+            'message': 'Internal Server Error'
+        }), 500
 
     return app
 

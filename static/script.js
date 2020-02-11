@@ -13,7 +13,7 @@ function get_categories() {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -26,7 +26,7 @@ function new_category() {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -58,7 +58,7 @@ function get_category(category_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -71,7 +71,7 @@ function edit_category(category_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -122,7 +122,7 @@ function get_types(category_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -135,7 +135,7 @@ function new_type() {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -167,7 +167,7 @@ function get_type(type_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -180,7 +180,7 @@ function edit_type(type_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -231,7 +231,7 @@ function get_animals(type_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -244,7 +244,7 @@ function new_animal() {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -276,7 +276,7 @@ function get_animal(animal_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
@@ -289,7 +289,7 @@ function edit_animal(animal_id) {
         return response.json()
     })
     .then(function (myJson) {
-        document.getElementById('form').innerHTML = myJson['html']
+        document.getElementById('form').innerHTML = myJson['form']
     })
 }
 
