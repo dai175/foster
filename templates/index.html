@@ -7,26 +7,20 @@
 </head>
 <body>
     <div class=page>
-        <h1>Foster an animal</h1>
-        <p>A place where animals meet foster parents.</p>
-        <div>
-        {% if not session.logged_in %}
-            <a href="{{ login }}"><button class="btn btn-primary btn-sm">Log in</button></a>
-        {% else %}
-            <a id="logout" href="/logout"><button class="btn btn-primary btn-sm">Log out</button></a>
-        {% endif %}
-        </div>
-        <div id="flash">
-        {% for message in get_flashed_messages() %}
-            <div id="messages" class="alert alert-primary" role="alert">{{ message }}</div>
-        {% endfor %}
+        <div id="header">
+            <h1>Foster an animal</h1>
+            <p>A place where animals meet foster parents.</p>
+            <div>
+            {% if not session.logged_in %}
+                <a href="{{ login }}"><button class="btn btn-primary btn-sm">Log in</button></a>
+            {% else %}
+                <a id="logout" href="/logout"><button class="btn btn-primary btn-sm">Log out</button></a>
+            {% endif %}
+            </div>
         </div>
         <div id="form"></div>
         <div id="footer">
-            <div class="container">
-                <p>Foster an animal &copy; All Rights Reserved.</p>
-                {% block footer %}{% endblock %}
-            </div>
+            <p>Foster an animal &copy; All Rights Reserved.</p>
         </div>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>

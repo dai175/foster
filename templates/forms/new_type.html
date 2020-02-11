@@ -1,4 +1,5 @@
 <div>
+    {% include "forms/flash.html" %}
     <h3>Create Type</h3>
     <form class="form" method="post" enctype="multipart/form-data" action="javascript:new_type_submission()">
         {{ form.csrf_token }}

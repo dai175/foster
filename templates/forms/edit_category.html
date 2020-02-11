@@ -1,4 +1,5 @@
 <div>
+    {% include "forms/flash.html" %}
     <h3>Edit Category</h3>
     <form class="form" method="post" enctype="multipart/form-data" action="javascript:edit_category_submission({{ category.id }})">
         {{ form.csrf_token }}
