@@ -1,333 +1,54 @@
-{% extends "layout.html" %}
-{% block body %}
-    <div id="form"></div>
+<!doctype html>
+<head>
+    <title>Foster an animal</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class=page>
+        <h1>Foster an animal</h1>
+        <p>A place where animals meet foster parents.</p>
+        <div>
+        {% if not session.logged_in %}
+            <a href="{{ login }}"><button class="btn btn-primary btn-sm">Log in</button></a>
+        {% else %}
+            <a id="logout" href="/logout"><button class="btn btn-primary btn-sm">Log out</button></a>
+        {% endif %}
+        </div>
+        <div id="flash">
+        {% for message in get_flashed_messages() %}
+            <div id="messages" class="alert alert-primary" role="alert">{{ message }}</div>
+        {% endfor %}
+        </div>
+        <div id="form"></div>
+        <div id="footer">
+            <div class="container">
+                <p>Foster an animal &copy; All Rights Reserved.</p>
+                {% block footer %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-        /* -------------------------------------------------------------------
-            categories
-        ------------------------------------------------------------------- */
-        function get_categories() {
-            fetch('/categories', {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + jwt,
-                    'form': document.forms[0]
-                }
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
+        let param = location.hash.split('&')
+        for (let i = 0; i < param.length; i++) {
+            let paramItem = param[i].split('=')
+            if (paramItem[0] == '#access_token') {
+                localStorage.setItem('token', paramItem[1])
+            }
         }
+        let jwt = localStorage.getItem('token')
 
-        function new_category() {
-            fetch('/categories/create', {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
+        {% if session.logged_in %}
+            get_categories()
+            let logout = document.getElementById('logout')
+            logout.addEventListener('click', function() {
+                localStorage.removeItem('token')
             })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function new_category_submission() {
-            let formData = new FormData(document.forms[0])
-            fetch('/categories/create', {
-                method: 'POST',
-                headers: {'Authorization': 'Bearer ' + jwt},
-                body: formData
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                if (myJson['success']) {
-                    location.reload()
-                } else {
-                    alert('Validation Error!!')
-                }
-            })
-        }
-
-        function get_category(category_id) {
-            fetch('/category/' + category_id, {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function edit_category(category_id) {
-            fetch('/category/' + category_id + '/edit', {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function edit_category_submission(category_id) {
-            let formData = new FormData(document.forms[0])
-            fetch('/category/' + category_id + '/edit', {
-                method: 'PATCH',
-                headers: {'Authorization': 'Bearer ' + jwt},
-                body: formData
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                if (myJson['success']) {
-                    location.reload()
-                } else {
-                    alert('Validation Error!!')
-                }
-            })
-        }
-
-        function delete_category(category_id) {
-            fetch('/category/' + category_id + '/delete', {
-                method: 'DELETE',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                location.reload()
-            })
-        }
-
-        /* -------------------------------------------------------------------
-            types
-        ------------------------------------------------------------------- */
-        function get_types(category_id) {
-            fetch('/types/' + category_id, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + jwt,
-                    'form': document.forms[0]
-                }
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function new_type() {
-            fetch('/types/create', {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function new_type_submission() {
-            let formData = new FormData(document.forms[0])
-            fetch('/types/create', {
-                method: 'POST',
-                headers: {'Authorization': 'Bearer ' + jwt},
-                body: formData
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                if (myJson['success']) {
-                    location.reload()
-                } else {
-                    alert('Validation Error!!')
-                }
-            })
-        }
-
-        function get_type(type_id) {
-            fetch('/type/' + type_id, {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function edit_type(type_id) {
-            fetch('/type/' + type_id + '/edit', {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function edit_type_submission(type_id) {
-            let formData = new FormData(document.forms[0])
-            fetch('/type/' + type_id + '/edit', {
-                method: 'PATCH',
-                headers: {'Authorization': 'Bearer ' + jwt},
-                body: formData
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                if (myJson['success']) {
-                    location.reload()
-                } else {
-                    alert('Validation Error!!')
-                }
-            })
-        }
-
-        function delete_type(type_id) {
-            fetch('/type/' + type_id + '/delete', {
-                method: 'DELETE',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                location.reload()
-            })
-        }
-
-        /* -------------------------------------------------------------------
-            Animals
-        ------------------------------------------------------------------- */
-        function get_animals(type_id) {
-            fetch('/animals/' + type_id, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + jwt,
-                    'form': document.forms[0]
-                }
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function new_animal() {
-            fetch('/animals/create', {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function new_animal_submission() {
-            let formData = new FormData(document.forms[0])
-            fetch('/animals/create', {
-                method: 'POST',
-                headers: {'Authorization': 'Bearer ' + jwt},
-                body: formData
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                if (myJson['success']) {
-                    location.reload()
-                } else {
-                    alert('Validation Error!!')
-                }
-            })
-        }
-
-        function get_animal(animal_id) {
-            fetch('/animal/' + animal_id, {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function edit_animal(animal_id) {
-            fetch('/animal/' + animal_id + '/edit', {
-                method: 'GET',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                document.getElementById('form').innerHTML = myJson['html']
-            })
-        }
-
-        function edit_animal_submission(animal_id) {
-            let formData = new FormData(document.forms[0])
-            fetch('/animal/' + animal_id + '/edit', {
-                method: 'PATCH',
-                headers: {'Authorization': 'Bearer ' + jwt},
-                body: formData
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                if (myJson['success']) {
-                    location.reload()
-                } else {
-                    alert('Validation Error!!')
-                }
-            })
-        }
-
-        function delete_animal(animal_id) {
-            fetch('/animal/' + animal_id + '/delete', {
-                method: 'DELETE',
-                headers: {'Authorization': 'Bearer ' + jwt}
-            })
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (myJson) {
-                location.reload()
-            })
-        }
-
+        {% endif %}
     </script>
-{% endblock %}
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
