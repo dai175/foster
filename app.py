@@ -142,6 +142,9 @@ def create_app(test_config=None):
     def get_category(jwt, category_id):
         try:
             category = Category.query.get(category_id)
+            if category is None:
+                abort(404)
+
         except exc.SQLAlchemyError:
             abort(422)
 
@@ -159,6 +162,9 @@ def create_app(test_config=None):
 
         try:
             category = Category.query.get(category_id)
+            if category is None:
+                abort(404)
+
         except exc.SQLAlchemyError:
             abort(422)
 
@@ -184,6 +190,9 @@ def create_app(test_config=None):
 
         try:
             category = Category.query.get(category_id)
+            if category is None:
+                abort(404)
+
             category.name = request.form['name']
             category.description = request.form['description']
             db.session.commit()
@@ -219,6 +228,9 @@ def create_app(test_config=None):
 
         try:
             category = Category.query.get(category_id)
+            if category is None:
+                abort(404)
+
             category_name = category.name
             db.session.delete(category)
             db.session.commit()
@@ -334,7 +346,13 @@ def create_app(test_config=None):
     def get_type(jwt, type_id):
         try:
             type = Type.query.get(type_id)
+            if type is None:
+                abort(404)
+
             category = Category.query.get(type.category_id)
+            if category is None:
+                abort(404)
+
         except exc.SQLAlchemyError:
             abort(422)
 
@@ -351,7 +369,11 @@ def create_app(test_config=None):
     def edit_type(jwt, type_id):
         try:
             categories = Category.query.order_by(Category.id).all()
+
             type = Type.query.get(type_id)
+            if type is None:
+                abort(404)
+
         except exc.SQLAlchemyError:
             abort(422)
 
@@ -393,6 +415,9 @@ def create_app(test_config=None):
 
         try:
             type = Type.query.get(type_id)
+            if type is None:
+                abort(404)
+
             type.name = request.form['name']
             type.description = request.form['description']
             type.category_id = int(request.form['category'])
@@ -427,6 +452,9 @@ def create_app(test_config=None):
 
         try:
             type = Type.query.get(type_id)
+            if type is None:
+                abort(404)
+
             type_name = type.name
             db.session.delete(type)
             db.session.commit()
@@ -545,7 +573,13 @@ def create_app(test_config=None):
     def get_animal(jwt, animal_id):
         try:
             animal = Animal.query.get(animal_id)
+            if animal is None:
+                abort(404)
+
             type = Type.query.get(animal.type_id)
+            if type is None:
+                abort(404)
+
         except exc.SQLAlchemyError:
             abort(422)
 
@@ -562,7 +596,11 @@ def create_app(test_config=None):
     def edit_animal(jwt, animal_id):
         try:
             types = Type.query.order_by(Type.id).all()
+
             animal = Animal.query.get(animal_id)
+            if animal is None:
+                abort(404)
+
         except exc.SQLAlchemyError:
             abort(422)
 
@@ -603,6 +641,9 @@ def create_app(test_config=None):
 
         try:
             animal = Animal.query.get(animal_id)
+            if animal is None:
+                abort(404)
+
             animal.name = request.form['name']
             animal.sex = request.form['sex']
             animal.date_of_birth = request.form['date_of_birth']
@@ -641,6 +682,9 @@ def create_app(test_config=None):
 
         try:
             animal = Animal.query.get(animal_id)
+            if animal is None:
+                abort(404)
+
             animal_name = animal.name
             db.session.delete(animal)
             db.session.commit()
