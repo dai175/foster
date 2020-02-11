@@ -52,8 +52,7 @@ class Animal(db.Model):
     place_of_birth = db.Column(db.String)
     description = db.Column(db.String)
     image = db.Column(db.String)
-    type_id = db.Column(db.Integer, db.ForeignKey('type.id'),
-                        nullable=False)
+    type_id = db.Column(db.Integer, db.ForeignKey('type.id'), nullable=False)
 
     def format(self):
         sex_dict = {1: 'male', 2: 'female'}

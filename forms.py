@@ -1,10 +1,8 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import Form, BooleanField, StringField, PasswordField, \
-    validators, TextAreaField, FieldList, FormField, SelectField, FloatField
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import StringField, SelectField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import InputRequired, InputRequired, Regexp, \
-    NumberRange, ValidationError
+from wtforms.validators import InputRequired, Regexp
 
 
 class CategoryForm(FlaskForm):
