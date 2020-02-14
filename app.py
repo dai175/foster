@@ -13,40 +13,32 @@ from auth import requires_auth
 from forms import CategoryForm, TypeForm, AnimalForm
 from models import db, Category, Type, Animal
 
-app = Flask(__name__)
-app.config.from_object('config')
-
-db.init_app(app)
-db.app = app
-
-migrate = Migrate(app, db)
-
-CORS(app)
-
-
-# ------------------------------------------------------------------------
-#   General functions
-# ------------------------------------------------------------------------
-
-def upload_image(file, lead, id):
-    image = Image.open(file)
-    resize_image = image.resize(
-        (int(image.width / image.height * consts.IMAGE_HEIGHT),
-         consts.IMAGE_HEIGHT)
-    )
-    filename = '{}{}.png'.format(lead, str(id).zfill(consts.NUMBER_OF_DIGITS))
-    resize_image.save(
-        os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    )
-
-    return filename
-
-
-# ------------------------------------------------------------------------
-#   Login and Logout
-# ------------------------------------------------------------------------
 
 def create_app(test_config=None):
+    app = Flask(__name__)
+    app.config.from_object('config')
+
+    db.init_app(app)
+    db.app = app
+
+    migrate = Migrate(app, db)
+
+    CORS(app)
+
+    def upload_image(file, lead, id):
+        image = Image.open(file)
+        resize_image = image.resize(
+            (int(image.width / image.height * consts.IMAGE_HEIGHT),
+             consts.IMAGE_HEIGHT)
+        )
+        filename = '{}{}.png'.format(lead,
+                                     str(id).zfill(consts.NUMBER_OF_DIGITS))
+        resize_image.save(
+            os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        )
+
+        return filename
+
     @app.route('/')
     def index():
         return render_template('index.html', login=app.config['LOGIN_URI'])
