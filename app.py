@@ -25,6 +25,7 @@ def create_app(test_config=None):
 
     CORS(app)
 
+    #  Resize and save image
     def upload_image(file, lead, id):
         image = Image.open(file)
         resize_image = image.resize(
@@ -105,6 +106,7 @@ def create_app(test_config=None):
             db.session.add(category)
             db.session.commit()
 
+            # Save images as
             file = request.files['image']
             if file:
                 filename = upload_image(
@@ -189,6 +191,7 @@ def create_app(test_config=None):
             category.description = request.form['description']
             db.session.commit()
 
+            # Save images as
             file = request.files['image']
             if file:
                 filename = upload_image(
@@ -272,6 +275,8 @@ def create_app(test_config=None):
             abort(422)
 
         form = TypeForm(request.form)
+
+        #  Add category list to form
         form.category.choices = [
             (category.id, category.name) for category in categories
         ]
@@ -290,6 +295,8 @@ def create_app(test_config=None):
             abort(422)
 
         form = TypeForm()
+
+        #  Add category list to form
         form.category.choices = [
             (category.id, category.name) for category in categories
         ]
@@ -311,6 +318,7 @@ def create_app(test_config=None):
             db.session.add(type)
             db.session.commit()
 
+            # Save images as
             file = request.files['image']
             if file:
                 filename = upload_image(file, consts.LEAD_TYPE, type.id)
@@ -372,6 +380,8 @@ def create_app(test_config=None):
         data = type.format()
 
         form = TypeForm(request.form)
+
+        #  Add category list to form
         form.category.choices = [
             (category.id, category.name) for category in categories
         ]
@@ -394,6 +404,8 @@ def create_app(test_config=None):
             abort(422)
 
         form = TypeForm()
+
+        #  Add category list to form
         form.category.choices = [
             (category.id, category.name) for category in categories
         ]
@@ -415,6 +427,7 @@ def create_app(test_config=None):
             type.category_id = int(request.form['category'])
             db.session.commit()
 
+            # Save images as
             file = request.files['image']
             if file:
                 filename = upload_image(file, consts.LEAD_TYPE, type_id)
@@ -496,6 +509,8 @@ def create_app(test_config=None):
             abort(422)
 
         form = AnimalForm(request.form)
+
+        #  Add category list to form
         form.type.choices = [
             (type.id, type.name) for type in types
         ]
@@ -514,6 +529,8 @@ def create_app(test_config=None):
             abort(422)
 
         form = AnimalForm()
+
+        #  Add category list to form
         form.type.choices = [
             (type.id, type.name) for type in types
         ]
@@ -538,6 +555,7 @@ def create_app(test_config=None):
             db.session.add(animal)
             db.session.commit()
 
+            # Save images as
             file = request.files['image']
             if file:
                 filename = upload_image(file, consts.LEAD_ANIMAL, animal.id)
@@ -599,6 +617,8 @@ def create_app(test_config=None):
         data = animal.format()
 
         form = AnimalForm(request.form)
+
+        #  Add category list to form
         form.type.choices = [
             (type.id, type.name) for type in types
         ]
@@ -621,6 +641,8 @@ def create_app(test_config=None):
             abort(422)
 
         form = AnimalForm()
+
+        #  Add category list to form
         form.type.choices = [
             (type.id, type.name) for type in types
         ]
@@ -645,6 +667,7 @@ def create_app(test_config=None):
             animal.type_id = int(request.form['type'])
             db.session.commit()
 
+            # Save images as
             file = request.files['image']
             if file:
                 filename = upload_image(file, consts.LEAD_ANIMAL, animal_id)
