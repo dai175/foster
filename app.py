@@ -34,8 +34,9 @@ def create_app(test_config=None):
         )
         filename = '{}{}.png'.format(lead,
                                      str(id).zfill(consts.NUMBER_OF_DIGITS))
+        mydir = os.path.dirname(__file__)
         resize_image.save(
-            os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            os.path.join(mydir + "/" + app.config['UPLOAD_FOLDER'], filename)
         )
 
         return filename
